@@ -1,7 +1,7 @@
 //@version=4
 strategy(title="Sean AO", shorttitle="SEAN AO", initial_capital=2500 ,default_qty_type = strategy.percent_of_equity, default_qty_value = 60,overlay=true)
 
-back_y = input(title="year",type=input.integer,defval = 2019)
+back_y = input(title="year",type=input.integer,defval = 2020)
 back_m = input(title="month",type=input.integer,defval = 1)
 back_d = input(title="day",type=input.integer,defval = 1)
 
