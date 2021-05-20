@@ -1,0 +1,17 @@
+//@version=4
+strategy(title="Sean AO", shorttitle="SEAN AO", initial_capital=2500 ,default_qty_type = strategy.percent_of_equity, default_qty_value = 60,overlay=true)
+
+back_y = input(title="year",type=input.integer,defval = 2019)
+back_m = input(title="month",type=input.integer,defval = 1)
+back_d = input(title="day",type=input.integer,defval = 1)
+
+back_start = timestamp(back_y,back_m,back_d,0,0,0)
+
+
+ao = sma((high+low)/2,5) - sma((high+low)/2,34)
+plot(ao, color = change(ao) <= 0 ? #872323 : #007F0E, style=plot.style_histogram)
+plot(ao)
+aol = change(ao) <= 0
+if time >= back_start
+    strategy.entry("進場", true,comment="多頭進場", when=aol)
+    strategy.exit("出場", "進場", limit = 1.25*strategy.position_avg_price, stop = 0.97*strategy.position_avg_price,comment="多頭出場")
