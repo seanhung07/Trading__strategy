@@ -1,0 +1,24 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © sean80111108
+
+//@version=4
+strategy(title="Sean RSI", shorttitle="Sean RSI", initial_capital=2500 ,default_qty_type = strategy.percent_of_equity, default_qty_value = 60,overlay=true)
+
+back_y = input(title="year",type=input.integer,defval = 2020)
+back_m = input(title="month",type=input.integer,defval = 1)
+back_d = input(title="day",type=input.integer,defval = 1)
+source = input(title="RSI source", type = input.source, defval = close)
+day = input(title="RSI day",type = input.integer, defval = 14)
+ob = input(title="Overbought",type = input.integer, defval = 80)
+os = input(title="Oversold", type= input.integer, defval = 20)
+
+
+back_start = timestamp(back_y,back_m,back_d,0,0,0)
+
+//RSI
+rsi = rsi(source,day)
+if time >= back_start
+    if rsi > os and rsi[1] < os
+        strategy.entry('rsi',long=true)
+    if rsi < ob and rsi[1] > ob
+        strategy.close('rsi')
