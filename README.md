@@ -2,7 +2,7 @@
 - [X] MACD <br/> 
 - [X] DMI <br/>
 - [X] AO  <br/>
-- [ ] RSI <br/>
+- [X] RSI <br/>
 - [ ] CCI <br/> 
 - [ ] 判斷支撐位、壓力位 <br/>
 # 策略開發步驟
