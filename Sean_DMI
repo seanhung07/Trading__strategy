@@ -19,8 +19,8 @@ if time >= back_start
     if buy_signal
         strategy.entry("dmi 進場", long = true)
     if sell_signal
-        strategy.close("dmi 出場")
+        strategy.close("dmi 進場")
     if buy_signal2
         strategy.entry("dmi 進場", long = true)
     if sell_signal2
-        strategy.close("dmi 出場")
+        strategy.close("dmi 進場")
