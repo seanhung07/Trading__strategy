@@ -29,4 +29,4 @@ if time >= back_start
     if macd_buy or change(ao) >= 0 and buy_signal and buy_signal2
         strategy.entry("進場", long = true)
     else if macd_sell and change(ao) < 0 and sell_signal and sell_signal2
-        strategy.close("進場")
+        strategy.close("進場",comment ="出場")
