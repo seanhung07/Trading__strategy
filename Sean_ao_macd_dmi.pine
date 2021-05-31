@@ -15,12 +15,12 @@ sell_signal = crossunder(diplus, diminus)
 buy_signal2 = diplus > diminus and adx > 15 and adx > adx[1]
 sell_signal2 = diplus < diminus
 
-//ao 
+//AO
 ao = sma((high+low)/2,5) - sma((high+low)/2,34)
 aol = change(ao) <= 0 
 aos = change(ao) > 0
 
-//macd
+//MACD
 dif = ema(close,12)-ema(close,36)
 macd = ema(dif,9)
 macd_buy = crossover(dif,macd)
