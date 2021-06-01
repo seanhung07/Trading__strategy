@@ -1,0 +1,39 @@
+//@version=4
+strategy(title="Sean AO macd dmi", shorttitle="SEAN AO macd dmi", initial_capital=1000 ,default_qty_type = strategy.percent_of_equity, default_qty_value = 100,overlay=true)
+
+back_y = input(title="year",type=input.integer,defval = 2019)
+back_m = input(title="month",type=input.integer,defval = 10,minval=1)
+back_d = input(title="day",type=input.integer,defval = 1,minval=1)
+len = input(title="length",type=input.integer,defval = 15,minval=1)
+adx_value = input(title="adx",type=input.integer,defval = 8,minval=1)
+back_start = timestamp(back_y,back_m,back_d,0,0,0)
+
+backtest_end_year=input(title="back_test_end_year",type=input.integer,defval=2020)
+backtest_end_month=input(title="back_test_end_month",type=input.integer,defval=7,minval=1,maxval=12)
+backtest_end_date=input(title="back_test_end_date",type=input.integer,defval=31,minval=1,maxval=31)
+backtest_end_time=timestamp(backtest_end_year,backtest_end_month,backtest_end_date,0,0,0)
+
+//DMI
+[diplus,diminus,adx] = dmi(len,adx_value)
+buy_signal = crossover(diplus, diminus)
+sell_signal = crossunder(diplus, diminus)
+buy_signal2 = diplus > diminus and adx > 15 and adx > adx[1]
+sell_signal2 = diplus < diminus
+
+//AO
+ao = sma((high+low)/2,5) - sma((high+low)/2,34)
+aol = change(ao) <= 0 
+aos = change(ao) > 0
+
+//MACD
+dif = ema(close,12)-ema(close,36)
+macd = ema(dif,9)
+macd_buy = crossover(dif,macd)
+macd_sell = crossunder(dif,macd)
+if time >= back_start and time <=backtest_end_time
+    if macd_buy or change(ao) >= 0 and buy_signal and buy_signal2
+        strategy.entry("進場", long = true)
+    if macd_sell and change(ao) < 0 and sell_signal and sell_signal2
+        strategy.close("進場",comment = "出場")
+        
+        
