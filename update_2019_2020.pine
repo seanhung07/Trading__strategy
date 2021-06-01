@@ -33,10 +33,8 @@ macd_sell = crossunder(dif,macd)
 if time >= back_start and time <=backtest_end_time
     if macd_buy or change(ao) >= 0 and buy_signal and buy_signal2
         strategy.entry("進場", long = true)
-        // strategy.close("做空",comment = "做空出場")
     if macd_sell and change(ao) < 0 and sell_signal and sell_signal2
         strategy.close("進場",comment = "出場")
-        // strategy.entry("做空",long = false)
         
 if time > backtest_end_time
     strategy.close("進場",comment = "出場")
