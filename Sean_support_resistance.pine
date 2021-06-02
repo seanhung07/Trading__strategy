@@ -10,7 +10,6 @@ linestyle = input(defval = 'Dashed', title = "Line Style", options = ['Solid', '
 linewidth = input(defval = 2, title = "Line Width", minval = 1, maxval = 4)
 resistancecolor = input(defval = color.red, title = "Resistance Color", type = input.color)
 supportcolor = input(defval = color.lime, title = "Support Color", type = input.color)
-showpp = input(false, title = "Show Point Points")
 back_y = input(title="year",type=input.integer,defval = 2020)
 back_m = input(title="month",type=input.integer,defval = 1)
 back_d = input(title="day",type=input.integer,defval = 1)
@@ -21,25 +20,23 @@ backtest_end_date=input(title="back_test_end_date",type=input.integer,defval=31,
 backtest_end_time=timestamp(backtest_end_year,backtest_end_month,backtest_end_date,0,0,0)
 
 float ph = na, float pl = na
-float src1 =  ppsrc == 'High/Low' ? high : max(close, open)
-float src2 =  ppsrc == 'High/Low' ? low: min(close, open)
-ph := pivothigh(src1, prd, prd)
-pl := pivotlow(src2, prd, prd)
+float src1 =  ppsrc == 'High/Low' ? high : max(close, open) //找出k棒最高
+float src2 =  ppsrc == 'High/Low' ? low: min(close, open) //找出k棒最低
+ph := pivothigh(src1, prd, prd) //assign 新的值給 ph
+pl := pivotlow(src2, prd, prd) //assign 新的值給 pl
 
-plotshape(ph and showpp, text = "H",  style = shape.labeldown, color = na, textcolor = color.red, location = location.abovebar, transp = 0, offset = -prd)
-plotshape(pl and showpp, text = "L",  style = shape.labelup, color = na, textcolor = color.lime, location = location.belowbar, transp = 0, offset = -prd)
 
 //calculate maximum S/R channel zone width
-prdhighest =  highest(300)
-prdlowest = lowest(300)
-cwidth = (prdhighest - prdlowest) * ChannelW / 100
+prdhighest =  highest(300) //尋找最高點
+prdlowest = lowest(300) //尋找最高點
+cwidth = (prdhighest - prdlowest) * ChannelW / 100 
 
 var pivotvals= array.new_float(0)
 
 if ph or pl
     array.unshift(pivotvals, ph ? ph : pl)
-    if array.size(pivotvals) > maxnumpp // limit the array size
-        array.pop(pivotvals)
+    if array.size(pivotvals) > maxnumpp // 限制線小於設定maxnumpp
+        array.pop(pivotvals) //大於就刪掉
 
 get_sr_vals(ind)=>
     float lo = array.get(pivotvals, ind)
@@ -47,26 +44,27 @@ get_sr_vals(ind)=>
     int numpp = 0
     for y = 0 to array.size(pivotvals) - 1
         float cpp = array.get(pivotvals, y)
-        float wdth = cpp <= lo ? hi - cpp : cpp - lo
+        float wdth = cpp <= lo ? hi - cpp : cpp - lo //計算central pivot point
         if wdth <= cwidth // fits the max channel width?
-            lo := cpp <= lo ? cpp : lo
-            hi := cpp > lo ? cpp : hi
-            numpp := numpp + 1
-    [hi, lo, numpp]  
+            lo := cpp <= lo ? cpp : lo //if central pivot point less than lowest point if lower than change central point to lower point
+            hi := cpp > lo ? cpp : hi //if central pivot point higher than highest point change central point to higher point
+            numpp := numpp + 1 //add 1 to count 
+    [hi, lo, numpp]   //return hi lo value
 
 var sr_up_level = array.new_float(0)
 var sr_dn_level = array.new_float(0)
 sr_strength = array.new_float(0)
 
+//find each pivot location
 find_loc(strength)=>
     ret = array.size(sr_strength)
     if ret > 0
         for i = array.size(sr_strength) - 1 to 0
-            if strength <= array.get(sr_strength, i)
+            if strength <= array.get(sr_strength, i) //get the number in array 
                 break
             ret := i
     ret
-
+//check them in channels if there can be S/R or not if not remove it from the array
 check_sr(hi, lo, strength)=>
     ret = true
     if array.size(sr_up_level) > 0
@@ -86,11 +84,11 @@ check_sr(hi, lo, strength)=>
 
 //get min time
 var int btime = time
-btime := na(time[1]) ? btime : min(btime, time - time[1])
+btime := na(time[1]) ? btime : min(btime, time - time[1]) //check the min if it is zero
 
 round_it(value)=> 
     round(value / syminfo.mintick) * syminfo.mintick
-
+//drawing
 draw_line(ycoor, Lstyle)=>
     line.new(x1 = bar_index, 
              y1 = ycoor, 
@@ -104,7 +102,8 @@ draw_line(ycoor, Lstyle)=>
 st = security(syminfo.tickerid, 'D', time)
 cl = security(syminfo.tickerid, 'D', time_close)
 opened = timenow > st and timenow < cl
-    
+
+//drawing
 draw_label(ycoor)=>
     rate = 100 * (ycoor - close) / close
     label.new(x = opened ? time + btime * 30 : time[100], 
@@ -115,6 +114,7 @@ draw_label(ycoor)=>
               xloc = xloc.bar_time, 
               yloc = yloc.price)
 
+//drawing
 set_lx(lab, lin)=>
     rate = 100 * (label.get_y(lab) - close) / close
     label.set_text(lab, text = tostring(label.get_y(lab)) + "(" + tostring(rate,'#.##') + "%)")
@@ -149,7 +149,7 @@ if ph or pl
                     array.pop(sr_strength)
                     array.pop(sr_up_level)
                     array.pop(sr_dn_level)
-    
+    //draw line
     line.delete(l1), line.delete(l2), line.delete(l3), line.delete(l4), line.delete(l5), line.delete(l6), line.delete(l7), line.delete(l8), line.delete(l9), line.delete(l10)
     label.delete(lb1), label.delete(lb2), label.delete(lb3), label.delete(lb4), label.delete(lb5), label.delete(lb6), label.delete(lb7), label.delete(lb8), label.delete(lb9), label.delete(lb10)
     if array.size(sr_up_level)
@@ -188,7 +188,7 @@ if ph or pl
             if x == 9
                 l10 := draw_line(mid, Lstyle)
                 lb10 := draw_label(mid)
-
+// check if the current candle crossover the resistance 
 f_crossed_over()=>
     ret = false
     if array.size(sr_up_level) > 0
@@ -197,7 +197,7 @@ f_crossed_over()=>
             if close[1] <= mid and close > mid
                 ret := true
     ret
-
+// check if the current candle crossunder the support
 f_crossed_under()=>
     ret = false
     if array.size(sr_up_level) > 0
@@ -206,11 +206,12 @@ f_crossed_under()=>
             if close[1] >= mid and close < mid
                 ret := true
     ret
-if time >= back_start
-// and time <= backtest_end_time
+if time >= back_start // and time <= backtest_end_time
     if f_crossed_over()
+    //if crossover 做多開單
         strategy.entry('long', long=true)
     if f_crossed_under()
+    // if crossunder 做空開單
         strategy.entry('short',long=false)
         // strategy.close('long')
 
