@@ -1,0 +1,32 @@
+//@version=4
+strategy("Sean cf", overlay=true, default_qty_type = strategy.percent_of_equity, default_qty_value = 100, initial_capital = 1000, commission_type = strategy.commission.percent, commission_value = 0)
+back_y = input(title="year",type=input.integer,defval = 2020)
+back_m = input(title="month",type=input.integer,defval = 1)
+back_d = input(title="day",type=input.integer,defval = 1)
+back_start = timestamp(back_y,back_m,back_d,0,0,0)
+
+left  = input(10)
+width = input(2, minval=1)
+SigVal = input(true, title="To Line \ From Line")
+reverse = input(false, title="Trade reverse")
+xLow = low
+xHigh = high
+xHighD = security(syminfo.tickerid,"W", high[1])
+xLowD  = security(syminfo.tickerid,"W", low[1])
+// sigpre1 = iff(xHigh <= xLowD, -1,
+//   iff(xLow >= xHighD, 1, nz(pos[1], 0))) 
+sigpre1 = 0.0
+pos = 0.0
+sigpre1 := iff(xHigh <= xLowD, -1, iff(xLow >= xHighD, 1, nz(pos[1], 0))) 
+sigpre2 = iff( xHigh <= xHighD, -1, iff(xLow >= xLowD, 1, nz(pos[1], 0))) 
+pos := SigVal ? sigpre1 : sigpre2
+possig = 0.0
+possig := iff(reverse and pos == 1, -1, iff(reverse and pos == -1, 1, pos))
+if time >= back_start
+    if possig == 1
+        strategy.entry("Long", strategy.long)
+    if possig == -1
+        strategy.entry("Short", strategy.short)	   	    
+barcolor(possig == -1 ? color.red: possig == 1 ? color.green : color.blue )
+plot(xLowD, color=color.green, title="S", style = plot.style_circles, linewidth = width)
+plot(xHighD, color=color.red, title="R", style = plot.style_circles, linewidth = width)
