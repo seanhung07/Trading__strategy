@@ -1,0 +1,30 @@
+//@version=4
+strategy(title="vegas", shorttitle="vegas", initial_capital=100, default_qty_type = strategy.percent_of_equity, default_qty_value = 100,overlay=true)
+back_y = input(title="year",type=input.integer,defval = 2021)
+back_m = input(title="month",type=input.integer,defval = 1)
+back_d = input(title="day",type=input.integer,defval = 1)
+back_start = timestamp(back_y,back_m,back_d,0,0,0)
+ma1 = input(12, minval=1, title="Length")
+ma2 = input(144, minval=1, title="Length")
+ma3 = input(169, minval=1, title="Length")
+ma4 = input(576, minval=1, title="Length")
+ma5 = input(676, minval=1, title="Length")
+src = input(close, title="Source")
+ma1_g = sma(src,ma1)
+ma2_g = sma(src,ma2)
+ma3_g = sma(src,ma3)
+ma4_g = sma(src,ma4)
+ma5_g = sma(src,ma5)
+plot(ma1_g, color=color.yellow, title="MA1")
+plot(ma2_g, color=color.blue, title="MA2")
+plot(ma3_g, color=color.blue, title="MA3")
+plot(ma4_g, color=color.white, title="MA4")
+plot(ma5_g, color=color.white, title="MA5")
+
+if time >= back_start
+    if ma1_g > ma2_g and  ma1_g > ma3_g and  ma1_g > ma4_g and  ma1_g > ma5_g
+        strategy.entry("long", long=true)
+    if  ma1_g < ma2_g and  ma1_g < ma3_g
+        strategy.entry("short",long=false)
+
+
