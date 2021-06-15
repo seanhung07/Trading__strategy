@@ -1,0 +1,7 @@
+//@version=4
+study("溢價指標")
+spread = security("BINANCE:BTCUSDTPERP",timeframe.period, ohlc4) - security("BINANCE:BTCUSDT",timeframe.period,ohlc4)
+funding_rate = spread/security("BINANCE:BTCUSDT",timeframe.period,ohlc4)
+ma = sma(funding_rate,1)
+plot(ma,title="entry")
+hline(0)
