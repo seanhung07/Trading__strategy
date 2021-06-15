@@ -24,7 +24,7 @@ plot(ma5_g, color=color.white, title="MA5")
 if time >= back_start
     if ma1_g > ma2_g and  ma1_g > ma3_g and  ma1_g > ma4_g and  ma1_g > ma5_g
         strategy.entry("long", long=true)
-    if  ma1_g < ma2_g and  ma1_g < ma3_g
+    if  ma1_g < ma2_g and  ma1_g < ma3_g and  ma1_g < ma4_g and  ma1_g < ma5_g
         strategy.entry("short",long=false)
 
 
