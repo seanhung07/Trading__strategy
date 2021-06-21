@@ -17,6 +17,10 @@ buy_signal2 = diplus > diminus and adx > 15 and adx > adx[1]
 sell_signal2 = diplus < diminus
 b = abs(diplus - abs(diminus)) > 8
 
+//Engulfing Candle
+//Original Engulfing Candle
+//bull close >= open[1] and close[1] < open[1]
+//bear opposite
 buy = close > open[1] and close > open[1] and close > open[2]
 sell =  close < open[1] and close[1] > open[1] and close < open[2]  and close < open[3]
 
