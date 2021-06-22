@@ -1,0 +1,42 @@
+
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © sean80111108
+
+//@version=4
+strategy(title="macd s1", shorttitle="MACD", initial_capital=1000 ,default_qty_type = strategy.percent_of_equity, default_qty_value = 100,overlay=false)
+back_y = input(title="year",type=input.integer,defval = 2021)
+back_m = input(title="month",type=input.integer,defval = 1)
+back_d = input(title="day",type=input.integer,defval = 1)
+back_start = timestamp(back_y,back_m,back_d,0,0,0)
+fast_length = input(title="Fast Length", type=input.integer, defval=12)
+slow_length = input(title="Slow Length", type=input.integer, defval=26)
+src = input(title="Source", type=input.source, defval=close)
+signal_length = input(title="Signal Smoothing", type=input.integer, minval = 1, maxval = 50, defval = 9)
+sma_source = input(title="Simple MA (Oscillator)", type=input.bool, defval=false)
+sma_signal = input(title="Simple MA (Signal Line)", type=input.bool, defval=false)
+// Plot colors
+col_grow_above = #26A69A
+col_grow_below = #FFCDD2
+col_fall_above = #B2DFDB
+col_fall_below = #EF5350
+col_macd = #0094ff
+col_signal = #ff6a00
+// Calculating
+fast_ma = sma_source ? sma(src, fast_length) : ema(src, fast_length)
+slow_ma = sma_source ? sma(src, slow_length) : ema(src, slow_length)
+macd = fast_ma - slow_ma
+signal = sma_signal ? sma(macd, signal_length) : ema(macd, signal_length)
+hist = macd - signal
+macd_buy = crossover(macd,signal)
+macd_sell = crossunder(macd,signal)
+plot(hist, title="Histogram", style=plot.style_columns, color=(hist>=0 ? (hist[1] < hist ? col_grow_above : col_fall_above) : (hist[1] < hist ? col_grow_below : col_fall_below) ), transp=0 )
+plot(macd, title="MACD", color=col_macd, transp=0)
+plot(signal, title="Signal", color=col_signal, transp=0)
+if time >= back_start
+    if macd > 0 and signal > 0 and macd_buy //macd and signal line > 0 at the same time and golden cross
+        strategy.entry("進場", true, comment = "macd 進場")
+    if  macd < 0 and signal < 0 and macd_sell //macd and signal line < 0 at the same time and death cross
+        strategy.entry("空", long=false,comment="空")
+    
+    
+    
