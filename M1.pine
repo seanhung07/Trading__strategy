@@ -1,0 +1,9 @@
+//@version=4
+study(title="M1", shorttitle="M1", resolution="")
+len = input(120, minval=1, title="Length")
+src = input(close, title="Source")
+mom = src - src[len]
+hline(0)
+mom30 = src - src[len]
+momma = ema(close, 30)
+plot(mom,style=plot.style_columns,color= color.green)
