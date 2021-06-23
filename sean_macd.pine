@@ -12,9 +12,15 @@ back_start = timestamp(back_y,back_m,back_d,0,0,0)
 
 //macd
 dif = ema(close,12)-ema(close,36)
-macd = ema(dif,9)
-macd_buy = crossover(dif,macd)
-macd_sell = crossunder(dif,macd)
+dea = ema(dif,9)
+macd = dif - dea
+macd_buy = crossover(dif,dea)
+macd_sell = crossunder(dif,dea)
 if time >= back_start
-    strategy.entry("進場", true,when=macd_buy, comment = "macd 進場")
-    strategy.close("進場", when = macd_sell,comment="macd 出場")
+    if dif > 0 and dea > 0 and macd_buy
+        strategy.entry("進場", true, comment = "macd 進場")
+    if dif > 0 and dea > 0 and macd_sell
+        strategy.close("進場",comment="macd 出場")
+    
+    
+    
