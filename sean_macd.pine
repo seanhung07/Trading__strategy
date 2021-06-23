@@ -19,7 +19,7 @@ macd_sell = crossunder(dif,dea)
 if time >= back_start
     if dif > 0 and dea > 0 and macd_buy
         strategy.entry("進場", true, comment = "macd 進場")
-    if dif > 0 and dea > 0 and macd_sell
+    if dif < 0 and dea < 0 and macd_sell
         strategy.close("進場",comment="macd 出場")
     
     
