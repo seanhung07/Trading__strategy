@@ -1,0 +1,31 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © sean80111108
+
+//@version=4
+strategy("Sean DMI stop", overlay=true, default_qty_type = strategy.percent_of_equity, default_qty_value = 100, initial_capital = 1000, commission_type = strategy.commission.percent, commission_value = 0)
+back_y = input(title="year",type=input.integer,defval = 2021)
+back_m = input(title="month",type=input.integer,defval = 1)
+back_d = input(title="day",type=input.integer,defval = 1)
+back_start = timestamp(back_y,back_m,back_d,0,0,0)
+len = input(title="length",type=input.integer,defval = 15)
+adx_value = input(title="adx",type=input.integer,defval = 8)
+[diplus,diminus,adx] = dmi(len,adx_value)
+longpercentage = input(title="追蹤止盈 (%)",type=input.float, minval=0.0, step=0.1, defval=3) * 0.01
+stopprice = 0.0
+
+stopprice := if (strategy.position_size > 0)
+    stopValue = close * (1 - longpercentage)
+    max(stopValue, stopprice[1])
+else
+    0
+
+buy_signal = crossover(diplus, diminus)
+sell_signal = crossunder(diplus, diminus)
+buy_signal2 = diplus > diminus and adx > 15 and adx > adx[1]
+sell_signal2 = diplus < diminus
+if time >= back_start
+    if buy_signal or buy_signal2
+        strategy.entry("dmi 進場", long = true)
+    if sell_signal or sell_signal2
+        strategy.close("dmi 進場")
+    strategy.exit("追蹤止盈", stop=stopprice)
