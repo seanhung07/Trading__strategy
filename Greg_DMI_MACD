@@ -1,0 +1,40 @@
+//@version=4
+strategy(title="Greg_DMI_MACD", shorttitle="Greg_DMI_MACD", initial_capital=2500 ,default_qty_type = strategy.percent_of_equity, default_qty_value = 100,overlay=true)
+
+back_y = input(title="year",type=input.integer,defval = 2020)
+back_m = input(title="month",type=input.integer,defval = 1)
+back_d = input(title="day",type=input.integer,defval = 1)
+len = input(title="length",type=input.integer,defval = 15)
+adx_value = input(title="adx",type=input.integer,defval = 8)
+back_start = timestamp(back_y,back_m,back_d,0,0,0)
+
+//DMI
+[diplus,diminus,adx] = dmi(len,adx_value)
+buy_signal = crossover(diplus, diminus)
+sell_signal = crossunder(diplus, diminus)
+buy_signal2 = diplus > diminus and adx > 15 and adx > adx[1]
+sell_signal2 = diplus < diminus
+adxr = sma(adx,10)
+dmi_buy = crossover(adx,adxr)
+dmi_sell = crossunder(adx,adxr)
+plot(adx,color = color.red)
+plot(adxr)
+
+//AO
+ao = sma((high+low)/2,5) - sma((high+low)/2,34)
+aol = change(ao) <= 0 
+aos = change(ao) > 0
+
+//MACD
+dif = ema(close,12)-ema(close,36)
+macd = ema(dif,9)
+macd_buy = crossover(dif,macd)
+macd_sell = crossunder(dif,macd)
+
+if time >= back_start
+    if macd_buy and dif>0 and macd >0 and dmi_buy 
+        strategy.entry("進場", long = true)
+    else if macd_sell and dif<0 and macd<0 and dmi_sell  
+        strategy.entry("進場", long = false)
+    else   
+        strategy.close("進場",comment ="出場")
