@@ -1,0 +1,38 @@
+//@version=4
+strategy("bitfinex",overlay= true, default_qty_type = strategy.percent_of_equity, default_qty_value = 100, initial_capital = 1000, commission_type = strategy.commission.percent, commission_value = 0)
+// study("bitfinex",overlay= false)
+back_y = input(title="year",type=input.integer,defval = 2021)
+back_m = input(title="month",type=input.integer,defval = 1)
+back_d = input(title="day",type=input.integer,defval = 1)
+back_start = timestamp(back_y,back_m,back_d,0,0,0)
+getmin = input(title="min", type=input.string,defval = "20")
+close1 = security("BITFINEX:ETHUSDLONGS", getmin, close) // 20 Minutes
+open1 = security("BITFINEX:ETHUSDLONGS", getmin, open)
+high1 = security("BITFINEX:ETHUSDLONGS", getmin, high)
+low1 = security("BITFINEX:ETHUSDLONGS", getmin, low)
+value1 = (open1+high1+low1+close1)/4
+
+// plot(value1)
+close2 = security("BITFINEX:ETHUSDSHORTS", "15", close) // 15 Minutes
+open2 = security("BITFINEX:ETHUSDSHORTS", "15", open)
+high2 = security("BITFINEX:ETHUSDSHORTS", "15", high)
+low2 = security("BITFINEX:ETHUSDSHORTS", "15", low)
+value2 = (open2+high2+low2+close2)/4
+// plot(value2,color = color.red)
+greenCandle = (close1 > open1)
+twoGreenCandles = greenCandle[1] and greenCandle
+redCandle = (close1 < open1)
+tworedCandles = redCandle[1] and redCandle
+shortgreenCandle = (close2 > open2)
+shortredCandle = (close2 < open2)
+
+
+if time >= back_start          
+    if greenCandle
+        strategy.entry("B L", long=true)
+    if tworedCandles
+        strategy.entry("B S", long=false)
+    // strategy.exit("出場", "B S", stop = 1.04*strategy.position_avg_price,comment="空頭出場")
+    // strategy.exit("出場", "B L", stop = 0.96*strategy.position_avg_price,comment="多頭出場")
+
+
