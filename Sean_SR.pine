@@ -1,0 +1,13 @@
+//@version=4
+
+study("Sean Support and Resistance", overlay=true)
+// Define "n" as the number of periods and keep a minimum value of 2 for error handling.
+n = input(title="Periods", defval=2, minval=2, type=input.integer)
+dnFractal = 0.0
+upFractal = 0.0
+dnFractal := (high[n-2] < high[n]) and (high[n-1] < high[n]) and (high[n+1] < high[n]) and (high[n+2] < high[n]) ? high : dnFractal[1]
+upFractal := (low[n-2] > low[n]) and (low[n-1] > low[n]) and (low[n+1] > low[n]) and (low[n+2] > low[n]) ? low : upFractal[1]
+
+// Plot the fractals as shapes on the chart.
+plotshape(dnFractal, title= "D", style=shape.circle, location=location.absolute, color=color.green, transp=10) 
+plotshape(upFractal, title="U", style=shape.circle, location=location.absolute, color=color.red, transp=10)
