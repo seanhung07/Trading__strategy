@@ -1,0 +1,7 @@
+//@version=4
+study("溢價指標")
+spread = security("BITFINEX:BTCUSD",timeframe.period, ohlc4) - security("BINANCE:BTCUSDT",timeframe.period,ohlc4)
+rate = spread/security("BINANCE:BTCUSDT",timeframe.period,ohlc4)
+ma = sma(rate,1)
+plot(ma,title="entry")
+hline(0)
